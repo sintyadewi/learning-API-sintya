@@ -27,12 +27,12 @@ class AuthController extends Controller
         // update password encryption
         Arr::set($validatedData, 'password', Hash::make($validatedData['password']));
 
-        // update firstname & lastname
+        // add firstname & lastname
         Arr::set($validatedData, 'firstname', $firstName);
         Arr::set($validatedData, 'lastname', $lastName);
 
-        // remove password coonfirmation
-        $fixedUser = Arr::except($validatedData, ['password_confirmation']);
+        // remove name field
+        $fixedUser = Arr::except($validatedData, ['name']);
 
         User::create($fixedUser);
 
