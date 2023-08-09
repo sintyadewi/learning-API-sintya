@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\API\V1\UserPostRequest;
 use App\Models\User;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -15,26 +13,17 @@ class AuthController extends Controller
     {
         $validatedData = $request->validated();
 
-        // preparation code to separate firstname & lastname
-        $nameArray           = Str::of($validatedData['name'])->explode(' ');
-        $nameFlattenArray    = Arr::flatten($nameArray);
-        $firstNameCollection = collect(Arr::except($nameFlattenArray, [count($nameFlattenArray) - 1]));
+        $user              = new User;
+        $firstName         = $user->getFirstName($validatedData['name']);
+        $lastName          = $user->getLastName($validatedData['name']);
+        $encryptedPassword = $user->getEncryptedPassword($validatedData['password']);
 
-        // get firstname & lastname
-        $firstName = $firstNameCollection->implode(' ');
-        $lastName  = Arr::last($nameFlattenArray);
-
-        // update password encryption
-        Arr::set($validatedData, 'password', Hash::make($validatedData['password']));
-
-        // add firstname & lastname
+        // set new value for firtsname, lastname, and password fields
         Arr::set($validatedData, 'firstname', $firstName);
         Arr::set($validatedData, 'lastname', $lastName);
+        Arr::set($validatedData, 'password', $encryptedPassword);
 
-        // remove name field
-        $fixedUser = Arr::except($validatedData, ['name']);
-
-        User::create($fixedUser);
+        $user->create($validatedData);
 
         return response()->json(['data' => (object) []], 201);
     }
