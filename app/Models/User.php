@@ -81,16 +81,6 @@ class User extends Authenticatable
         );
     }
 
-    protected function email(): Attribute
-    {
-        return Attribute::make(
-            null,
-            function ($value) {
-                return $value;
-            }
-        );
-    }
-
     protected function password(): Attribute
     {
         return Attribute::make(
