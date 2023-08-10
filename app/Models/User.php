@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -55,32 +57,47 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
-    protected function getNameCollection($fullName): object
+    protected function firstname(): Attribute
     {
-        $nameCollection = Str::of($fullName)->explode(' ');
+        return Attribute::make(
+            null,
+            function ($value) {
+                $nameCollection = Str::of($value)->explode(' ');
 
-        return $nameCollection;
+                return $nameCollection->first();
+            }
+        );
     }
 
-    public function getFirstName($fullName): string
+    protected function lastname(): Attribute
     {
-        $nameCollection = $this->getNameCollection($fullName);
-        $firstName      = $nameCollection->take(count($nameCollection) - 1)->all();
-        $firstName      = implode(' ', $firstName);
+        return Attribute::make(
+            null,
+            function ($value) {
+                $nameCollection = Str::of($value)->explode(' ');
 
-        return $firstName;
+                return $nameCollection->skip(1)->implode(' ');
+            }
+        );
     }
 
-    public function getLastName($fullName): string
+    protected function email(): Attribute
     {
-        $nameCollection = $this->getNameCollection($fullName);
-        $lastName       = $nameCollection->last();
-
-        return $lastName;
+        return Attribute::make(
+            null,
+            function ($value) {
+                return $value;
+            }
+        );
     }
 
-    public function getEncryptedPassword($password)
+    protected function password(): Attribute
     {
-        return Hash::make($password);
+        return Attribute::make(
+            null,
+            function ($value) {
+                return Hash::make($value);
+            }
+        );
     }
 }
