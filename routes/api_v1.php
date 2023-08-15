@@ -18,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/user', [UserController::class, 'index']);
+
+Route::group(['middleware' => ['auth:sanctum', 'verified.token']], function () {
+    Route::get('/user/{user}', [UserController::class, 'detail']);
+});
