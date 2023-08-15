@@ -16,8 +16,8 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $bearerToken = Auth::user()->currentAccessToken();
-        $userToFind = $request->route()->parameter('user');
+        $bearerToken  = Auth::user()->currentAccessToken();
+        $userToFind   = $request->route()->parameter('user');
         $isTokenValid = $userToFind->tokens()->find($bearerToken)->isNotEmpty();
 
         if ($isTokenValid) {
